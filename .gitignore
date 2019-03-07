@@ -1,3 +1,7 @@
 
 .DS_Store
 assets/.DS_Store0
+.DS_Store
+vendor/.DS_Store
+vendor/bundle/.DS_Store
+vendor/bundle/ruby/.DS_Store
