@@ -1,0 +1,374 @@
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+    body { font: 10px sans-serif; }
+
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+    }
+    .pagebreak { page-break-after: always; }
+
+    .point { stroke: #000; }
+
+    .legend rect {
+    fill:white;
+    stroke:black;
+    opacity:0.8;}
+  }
+
+</style>
+<body>
+<script type="text/javascript" src="/JS/d3.v5.min.js" charset="utf-8"></script>
+<script>
+
+
+    var margin = {top: 40, right: 10, bottom: 40, left: 50},
+        width = 600 - margin.left - margin.right,
+        height = 400 - margin.top - margin.bottom;
+
+    var x = d3.scaleLinear()
+        .range([0, width]);
+
+    var y = d3.scaleLinear()
+        .range([height, 0]);
+
+    var wn = d3.scaleLinear()
+        .range([10, 500]);
+
+    var svg1 = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .attr("class", "pagebreak")
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg1.append("g")
+        .attr("class","legend")
+        .attr("transform","translate(50,30)")
+        .style("font-size","12px")
+        // .call(d3.legend);
+
+    svg1.append("text")
+        .attr("x", (width / 2))
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("text-decoration", "underline")
+        .text("Wins+Nominations vs. Rating");
+
+    // text label for the x axis
+    svg1.append("text")
+        .attr("x", (width / 2))
+        .attr("y", (height + (0.75 * margin.bottom)))
+        .style("text-anchor", "middle")
+        .style("font-size", "12px")
+        .text("Rating");
+
+    // text label for the y axis
+    svg1.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - (0.75 * margin.left ))
+        .attr("x",0 - (height / 2))
+        .style("text-anchor", "middle")
+        .style("font-size", "12px")
+        .text("Wins+Nominations");
+
+    //svg1.append("g").call(d3.legend);
+
+    var legend1 = svg1.append("g")
+                      .attr("class","legend")
+                      // .attr("transform","translate(0,0)")
+                      .style("font-size","12px")
+                      // .call(d3.legend);
+
+    var svg2 = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("class", "pagebreak")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        // .attr("class","legend")
+        // .attr("transform","translate(50,30)")
+        // .style("font-size","12px")
+        // .call(d3.legend);
+
+    svg2.append("text")
+        .attr("x", (width / 2))
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("text-decoration", "underline")
+        .text("Budget vs. Rating");
+
+    // text label for the x axis
+    svg2.append("text")
+        .attr("x", (width / 2))
+        .attr("y", (height + (0.75 * margin.bottom)))
+        .style("text-anchor", "middle")
+        .style("font-size", "12px")
+        .text("Rating");
+
+    // text label for the y axis
+    svg2.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - (0.75 * margin.left ))
+        .attr("x",0 - (height / 2))
+        .style("text-anchor", "middle")
+        .style("font-size", "12px")
+        .text("Budget (M)");
+
+    //Add another graph
+    var svg3 = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("class", "pagebreak")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        // .attr("class","legend")
+        // .attr("transform","translate(50,30)")
+        // .style("font-size","12px")
+        // .call(d3.legend);
+
+    //Add the title
+    svg3.append("text")
+        .attr("x", (width / 2))
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("text-decoration", "underline")
+        .text("Votes vs. Rating sized by Wins+Nominations");
+
+    // text label for the x axis
+    svg3.append("text")
+        .attr("x", (width / 2))
+        .attr("y", (height + (0.75 * margin.bottom)))
+        .style("text-anchor", "middle")
+        .style("font-size", "12px")
+        .text("Rating");
+
+    // text label for the y axis
+    svg3.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - (0.75 * margin.left ))
+        .attr("x",0 - (height / 2))
+        .style("text-anchor", "middle")
+        .style("font-size", "12px")
+        .text("Votes (Thousands)");
+
+    var svg4 = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("class", "pagebreak")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg4.append("text")
+        .attr("x", (width / 2))
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("text-decoration", "underline")
+        .text("Wins+Nominations (square-root-scaled) vs. Rating");
+
+    // text label for the x axis
+    svg4.append("text")
+        .attr("x", (width / 2))
+        .attr("y", (height + (0.75 * margin.bottom)))
+        .style("text-anchor", "middle")
+        .style("font-size", "12px")
+        .text("Rating");
+
+    // text label for the y axis
+    svg4.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - (0.75 * margin.left ))
+        .attr("x",0 - (height / 2))
+        .style("text-anchor", "middle")
+        .style("font-size", "12px")
+        .text("Wins+Nominations");
+
+    var svg5 = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("class", "pagebreak")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg5.append("text")
+        .attr("x", (width / 2))
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("text-decoration", "underline")
+        .text("Wins+Nominations (log-scaled) vs. Rating");
+
+    // text label for the x axis
+    svg5.append("text")
+        .attr("x", (width / 2))
+        .attr("y", (height + (0.75 * margin.bottom)))
+        .style("text-anchor", "middle")
+        .style("font-size", "12px")
+        .text("Rating");
+
+    // text label for the y axis
+    svg5.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - (0.75 * margin.left ))
+        .attr("x",0 - (height / 2))
+        .style("text-anchor", "middle")
+        .style("font-size", "12px")
+        .text("Wins+Nominations");
+
+
+    // svg2.append("svg")
+    //     .attr("class","legend")
+    //     .attr("transform","translate(50,30)")
+    //     .style("font-size","12px")
+    //     .call(d3.legend)
+
+    d3.csv("movies.csv")
+        .then(function(data) {
+        // Coerce the strings to numbers.
+        data.forEach(function(d) {
+            d.Rating = +d.Rating;
+            d.WinsNoms = +d.WinsNoms;
+            d.IsGoodRating = +d.IsGoodRating;
+            d.Budget = +d.Budget;
+            d.Votes = +d.Votes;
+        });
+
+        // Compute the scales’ domains.
+        x.domain(d3.extent(data, function(d) { return d.Rating; })).nice();
+        y.domain(d3.extent(data, function(d) { return d.WinsNoms; })).nice();
+
+        // Add the x-axis.
+        svg1.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+        // Add the y-axis.
+        svg1.append("g")
+            .attr("class", "y axis")
+            .call(d3.axisLeft(y));
+
+        // Add the points!
+        svg1.selectAll(".point")
+            .data(data)
+            .enter().append("path")
+            .attr("class", "point")
+            .attr("data-legend",function(d) { return d.name})
+            .attr("d", d3.symbol().type(function(d) {if (d.IsGoodRating) {return d3.symbolCross;} else {return d3.symbolCircle;} }))
+            .attr("fill", function(d) {if (d.IsGoodRating) {return '#00f';} else {return '#f00';} })
+            .attr("transform", function(d) { return "translate(" + x(d.Rating) + "," + y(d.WinsNoms) + ")"; });
+
+        // Compute the scales’ domains.
+        x.domain(d3.extent(data, function(d) { return d.Rating; })).nice();
+        y.domain(d3.extent(data, function(d) { return d.Budget/1000000; })).nice();
+
+
+        // Add the x-axis.
+        svg2.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+        // Add the y-axis.
+        svg2.append("g")
+            .attr("class", "y axis")
+            .call(d3.axisLeft(y));
+
+        // Add the points!
+        svg2.selectAll(".point")
+            .data(data)
+            .enter().append("path")
+            .attr("class", "point")
+            //.attr("data-legend",function(d) {if (d.IsGoodRating) {return 'Good';} else {return 'Bad';} })
+            .attr("d", d3.symbol().type(function(d) {if (d.IsGoodRating) {return d3.symbolCross;} else {return d3.symbolCircle;} }))
+            .attr("fill", function(d) {if (d.IsGoodRating) {return '#00f';} else {return '#f00';} })
+            .attr("transform", function(d) { return "translate(" + x(d.Rating) + "," + y(d.Budget/1000000) + ")"; });
+
+        // Compute the scales’ domains.
+        x.domain(d3.extent(data, function(d) { return d.Rating; })).nice();
+        y.domain(d3.extent(data, function(d) { return d.Votes/1000; })).nice();
+        wn.domain(d3.extent(data, function(d) { return d.WinsNoms; })).nice();
+        console.log(wn.domain());
+
+        // Add the x-axis.
+        svg3.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+        // Add the y-axis.
+        svg3.append("g")
+            .attr("class", "y axis")
+            .call(d3.axisLeft(y));
+
+        // Add the points!
+        svg3.selectAll(".point")
+            .data(data)
+            .enter().append("path")
+            .attr("class", "point")
+            //.attr("size", function(d) { return wn(d.WinsNoms); })
+            .attr("d", d3.symbol().size(function(d) { return wn(d.WinsNoms); }).type(function(d) {if (d.IsGoodRating) {return d3.symbolCross;} else {return d3.symbolCircle;} }))
+            .attr("fill", function(d) {if (d.IsGoodRating) {return '#00f';} else {return '#f00';} })
+            .attr("transform", function(d) { return "translate(" + x(d.Rating) + "," + y(d.Votes/1000) + ")"; });
+
+        // Compute the scales’ domains.
+        x.domain(d3.extent(data, function(d) { return d.Rating; })).nice();
+        y.domain(d3.extent(data, function(d) { return Math.sqrt(d.WinsNoms); })).nice();
+
+        // Add the x-axis.
+        svg4.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+        // Add the y-axis.
+        svg4.append("g")
+            .attr("class", "y axis")
+            .call(d3.axisLeft(y));
+
+        // Add the points!
+        svg4.selectAll(".point")
+            .data(data)
+            .enter().append("path")
+            .attr("class", "point")
+            .attr("d", d3.symbol().type(function(d) {if (d.IsGoodRating) {return d3.symbolCross;} else {return d3.symbolCircle;} }))
+            .attr("fill", function(d) {if (d.IsGoodRating) {return '#00f';} else {return '#f00';} })
+            .attr("transform", function(d) { return "translate(" + x(d.Rating) + "," + y(Math.sqrt(d.WinsNoms)) + ")"; });
+
+        // Compute the scales’ domains.
+        x.domain(d3.extent(data, function(d) { return d.Rating; })).nice();
+        y.domain(d3.extent(data, function(d) { return Math.log10(d.WinsNoms ? d.WinsNoms : 1); })).nice();
+
+        // Add the x-axis.
+        svg5.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+        // Add the y-axis.
+        svg5.append("g")
+            .attr("class", "y axis")
+            .call(d3.axisLeft(y));
+
+        // Add the points!
+        svg5.selectAll(".point")
+            .data(data)
+            .enter().append("path")
+            .attr("class", "point")
+            .attr("d", d3.symbol().type(function(d) {if (d.IsGoodRating) {return d3.symbolCross;} else {return d3.symbolCircle;} }))
+            .attr("fill", function(d) {if (d.IsGoodRating) {return '#00f';} else {return '#f00';} })
+            .attr("transform", function(d) { return "translate(" + x(d.Rating) + "," + y(Math.log10(d.WinsNoms ? d.WinsNoms : 1)) + ")"; });
+
+
+    });
+
+</script>

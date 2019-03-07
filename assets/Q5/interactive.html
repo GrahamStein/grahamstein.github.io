@@ -1,0 +1,333 @@
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+  <title>gstein9</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <script type="text/javascript" src="/JS/d3.v5.min.js" charset="utf-8"></script>
+</head>
+<style>
+
+body {
+  font-family: 'Open Sans', sans-serif;
+}
+
+div#layout {
+  text-align: center;
+}
+
+div#container {
+  width: 1000px;
+  height: 600px;
+  margin: auto;
+  background-color: #fff;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+}
+
+.bar {
+  fill: #ccc;
+}
+
+text {
+  font-size: 12px;
+  fill: #000;
+}
+
+path {
+  stroke: gray;
+}
+
+line {
+  stroke: gray;
+}
+
+line#limit {
+  stroke: #FED966;
+  stroke-width: 3;
+  stroke-dasharray: 3 6;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+.grid .tick line {
+  stroke: #9FAAAE;
+  stroke-opacity: 0.3;
+}
+
+text.divergence {
+  font-size: 14px;
+  fill: #2F4A6D;
+}
+
+text.value {
+  font-size: 14px;
+}
+
+text.title {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+text.label {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+text.source {
+  font-size: 10px;
+}
+
+
+
+</style>
+
+<body>
+  <div id='layout'>
+    <!-- <h2>Bar chart example</h2> -->
+    <div id='container'>
+      <svg />
+      <script>
+      const data=[{country: 'Bangladesh', population_2012: 105905297, growth: {year_2013:42488 , year_2014:934 , year_2015:52633 , year_2016:112822 , year_2017:160792}},
+                {country: 'Ethopia', population_2012: 75656319, growth: {year_2013:1606010 , year_2014:1606705 , year_2015:1600666 , year_2016:1590077 , year_2017:1580805}},
+                {country: 'Kenya', population_2012: 33007327, growth: {year_2013:705153 , year_2014:703994 , year_2015:699906 , year_2016:694295 , year_2017:687910}},
+                {country: 'Afghanistan', population_2012: 23280573, growth: {year_2013:717151 , year_2014:706082 , year_2015:665025 , year_2016:616262 , year_2017:573643}},
+                {country: 'Morocco', population_2012: 13619520, growth: {year_2013:11862 , year_2014:7997 , year_2015:391 , year_2016:-8820 , year_2017:-17029}}];
+
+      console.log('Stp 1', data);
+
+
+
+
+      const svg = d3.select('svg');
+      const svgContainer = d3.select('#container');
+
+      const windowX = 350;
+      const windowY = 250;
+
+      const margin = 40;
+      const width = 1100 - windowX - 2 * margin ;
+      const height = 600 - 2 * margin;
+
+
+      const chart = svg.append('g')
+      .attr('transform', `translate(${margin}, ${margin})`)
+      .selectAll()
+      .data(data)
+      .enter()
+      .append('g');
+
+      const xScale = d3.scaleLinear()
+      .range([margin, width - 2 * margin])
+      //.domain([0, Math.max(data.map((s) => s.population_2012))]);
+      //convert this to dynamic
+      .domain([0, 110000000]);
+
+      //console.log('dynamic range=', d3.range(0,5).map(finalPopulation));
+
+      const yScale = d3.scaleBand()
+      // .range([height, 0])
+      .range([0, height])
+      .domain(data.map((s) => s.country))
+      .padding(0.4);
+
+      const miniXscale = d3.scaleLinear()
+      .range([width + margin, width + windowX + margin])
+      .domain([2013, 2018]);
+
+      miniXscale.tickFormat(5, "+");
+
+
+
+      const miniYscale = d3.scaleLinear()
+      .range([margin, windowY + margin])
+      .domain([.033, -.005]);
+      //.tickFormat("+%");
+      //.tickFormat(d3.format(",.0f"));
+      miniYscale.tickFormat("+%");
+
+
+      function percentChange(dataSet) {
+        if (!dataSet.population_2012) {console.log("Error: ", dataSet); return};
+          initialPop = dataSet.population_2012
+          // console.log(dataSet);
+          changePop = [dataSet.growth.year_2013, dataSet.growth.year_2014,
+                dataSet.growth.year_2015, dataSet.growth.year_2016, dataSet.growth.year_2017];
+          //console.log('stp 0',initialPop, changePop, changePop[0]);
+          var i,
+              change = [];
+          for (i = 0; i < changePop.length; i++) {
+            change.push((changePop[i])/initialPop);
+            initialPop += changePop[i];
+          };
+          // console.log('change=',change, initialPop);
+          return change
+        };
+        console.log('% Change = ',percentChange(data[0]));
+
+      function formatNumber(num) {
+        return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+      }
+
+      const yearMin = 2013,
+            yearMax = 2017;
+
+      function mappedData(data, i=-1) {
+        if(i>= 0){data = data[i];};
+        return d3.range(yearMin, yearMax+1).map(function(d) { return {"y": percentChange(data)[d-2013] } })
+      };
+
+
+
+      // function updateScale(d) {
+      //   miniYscale().domain(d3.extent(data, function(d) { return percentChange(data, d); }));
+      // }
+function drawSubchart(data, selectedLine = 0) {
+
+      // define the line
+      var line = d3.line()
+          .x(function(d, i) {/*console.log("d, i", d, i, miniXscale(i+2013), miniYscale(d.y));*/ return miniXscale(i+2012.5); })
+          .y(function(d, i) { return miniYscale(d.y); });
+
+
+
+      // chart
+      //     .append('rect')
+      //     .attr('class', 'linegraph')
+      //     .style('fill', '#ccc')
+      //     .attr('opacity', 0.1)
+      //     .attr('x', (width))
+      //     .attr('y', margin)
+      //     .attr('width', windowX)
+      //     .attr('height', windowY);
+
+
+      // // 9. Append the path, bind the data, and call the line generator
+      chart.append("path")
+          .datum(function (d, i) {return mappedData(data[i])}) // 10. Binds data to the line
+          .attr("class", function (d, i) {console.log("line-"+i, i, d); return "line-"+i }) // Assign a class for styling
+          .style("fill", "#fff")
+          .attr("d", line)
+          .style("stroke-width", 5)
+          // .style("fill", "#fff")
+          .style("opacity", (d,i) => (i==selectedLine)?1:0); // 11. Calls the line generator
+
+          //miniYscale.domain((data, selectedLine) => d3.extent(percentChange(data)[selectedLine]));
+
+          var yAxis = d3.axisLeft(miniYscale).ticks(5, "+%"),
+            xAxis = d3.axisBottom(miniXscale).ticks(5, "");
+
+
+          chart.append('g').attr('class','x axis').call(xAxis)
+          .attr("transform", "translate(" + -margin + "," + (windowY + margin) + ")")
+          .append("text")
+            .attr("class", "label")
+            .attr("x", width + windowX - 60)
+            .attr("y", 50)
+            .attr("text-anchor", "end")
+            .text("Year:");
+
+          chart.append('g').attr('class','y axis').call(yAxis)
+          // .attr("transform", "translate(0," + windowY + ")");
+            .attr("transform", "translate(" + width + ",0)")
+            .append("text")
+            .attr("class", "label")
+            .attr("x", width - 400)
+            .attr("y", 0)
+            .attr("text-anchor", "end")
+            .text("Population Change for Selected Country:");
+
+            chart.append('g')
+                .append("text")
+                .attr("class", "label")
+                .attr("x", width/4)
+                .attr("y", 0)
+                .text("2017 Population By Country")
+}
+
+
+
+
+      // const chart = chart.selectAll()
+      // .data(data)
+      // .enter()
+      // .append('g');
+
+
+
+      drawSubchart(data, 0);
+
+
+    function finalPopulation(g) {return g.population_2012+g.growth.year_2013
+                                       +g.growth.year_2014+g.growth.year_2015
+                                       +g.growth.year_2016+g.growth.year_2017};
+
+    console.log(finalPopulation(data[0]));
+
+      chart
+      .append('rect')
+      .attr('class', 'bar')
+      .attr('x', (g) => margin)
+      .attr('y', (g) => yScale(g.country))
+      .attr('height', yScale.bandwidth())
+      .attr('width', (g) => xScale(finalPopulation(g)))
+      .on('mouseenter', function (actual, i) {
+        d3.select(this)
+          .transition()
+          .duration(100)
+          .style('fill', '#0ee');
+
+          d3.selectAll("path")
+            .transition()
+            .duration(100)
+            .style("opacity", 0);
+
+        d3.select("line-" + i)
+          .transition()
+          .duration(100)
+          .style("opacity", 1)
+
+        drawSubchart(data, i);
+        console.log('redrawn');
+
+      })
+        .on('mouseleave', function (actual, i) {
+          d3.select(this)
+            .transition()
+            .duration(100)
+            .style('fill', '#ccc');
+          });;
+
+      // console.log('Stp 4', (g) => length - xScale(g.population_2012), chart);
+
+      chart
+      .append('text')
+      .attr('class', 'value')
+      .attr('x', 50)
+      .attr('y', (g) => yScale(g.country) + yScale.bandwidth() / 2 + 5)
+      .style('text-anchor', 'center')
+      .style('font-size', '12px')
+      .text((g) => formatNumber(finalPopulation(g)));
+
+
+      chart
+      .append('text')
+      .attr('class', 'value')
+      .attr('x', -40)
+      .attr('y', (g) => yScale(g.country) + yScale.bandwidth() / 2 + 5)
+      .style('text-anchor', 'center')
+      .style('font-size', '12px')
+      .text((a) => `${a.country}`)
+
+      </script>
+    </div>
+  </div>
+
+</body>
+</html>
