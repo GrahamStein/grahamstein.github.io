@@ -9,7 +9,7 @@ export default class Rectangle {
         this.height = height;
         this.element = document.createElement("div");
         this.element.classList.add(this.color);
-        this.element.style.position = "absolute";
+        this.element.style.position = "relative";
         this.speed = this.speed;
 
 

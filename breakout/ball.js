@@ -90,7 +90,10 @@ export class Ball {
                 this.left  < bricks[i].right &&
                 this.top < bricks[i].bottom  &&
                 this.bottom > bricks[i].top) {
+
                 bricks[i].destroy();
+                this.bounceY();
+
                 console.log(bricks, bricks.length)
 
             }
