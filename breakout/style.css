@@ -1,0 +1,51 @@
+#game-state {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+    color: black;
+    background-color: white;
+    padding: 5px 10px;
+    display: inline-block;
+    width: 800px;
+    height: 35px;
+}
+
+#play-area {
+    position: relative;
+    width:800px;
+    height: 600px;
+    background-color: #dc3f3f;
+    border: 3px solid #222;
+}
+
+/* Walls */
+.rectangle{
+    position: relative;
+
+}
+.wall {
+    background-color: black;
+    thickness: 5px;
+
+}
+
+.paddle {
+    width: 60px;
+    height: 10px;
+    background-color: blue;
+    border-color: black;
+}
+
+.brick {
+    background-color: orange;
+    border-color: black;
+}
+
+.ball {
+    background-color: blue;
+    border-color: black;
+    border: 2px solid black;
+}
+
+
