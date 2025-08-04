@@ -16,7 +16,7 @@
     width:800px;
     height: 600px;
     background-color: #dc3f3f;
-    border: 3px solid #222;
+    /*border: 3px solid #222;*/
 }
 
 /* Walls */
@@ -35,11 +35,15 @@
     height: 10px;
     background-color: blue;
     border-color: black;
+    border: 2px solid black;
+
 }
 
 .brick {
     background-color: orange;
     border-color: black;
+    border: 2px solid black;
+
 }
 
 .ball {

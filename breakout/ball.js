@@ -69,10 +69,23 @@ export class Ball {
         return isHittingWall;
     }
 
-    detect_paddle_collision(paddle) {
+    detect_paddle_collision(paddle, rebound) {
         if (this.right > paddle.left && this.left < paddle.right
             && this.bottom > paddle.top && this.top < paddle.bottom) {
-            this.bounceY();
+            if (rebound) {
+                ball.color = 'red';
+                paddle.color = 'blue';
+
+                let ratio = (paddle.center - ball.x)/(paddle.width);
+                console.log(ratio, ball.xVelocity, ball.yVelocity);
+                ball.xVelocity *= ratio;
+                ball.yVelocity *= ratio;
+                this.bounceY();
+
+            }
+            else {
+                this.bounceY();
+            }
             // this.bounceX();
             return true
         }

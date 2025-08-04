@@ -1,12 +1,13 @@
 
 
 export default class Rectangle {
-    constructor(name, x, y, width, height, className, speed = undefined){
+    constructor(name, x, y, width, height, className, color, speed = undefined){
         this.name = name;
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+        this.color = color;
         this.element = document.createElement("div");
         this.element.classList.add(this.color);
         this.element.style.position = "relative";
@@ -52,8 +53,6 @@ export class Wall extends Rectangle {
         this.height = height;
 
         this.element.classList.add("wall");
-
-        // console.log(`Ball collided with ${this.name}`);
 
         this.draw()
     }

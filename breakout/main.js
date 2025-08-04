@@ -1,20 +1,18 @@
 import { Wall, Brick } from './rectangle.js';
 import { Ball } from './ball.js';
 import { Paddle } from './paddle.js';
+import { GAME_CONFIG } from './config.js';
 
 window.onload = () => {
 
     const stateDiv = document.querySelector("#game-state");
     const gameDiv = document.querySelector("#play-area");
-    const borderThickness = 10;
-    const innerGameWidth = 800 - 2 * borderThickness;
-    // const innerGameHeight = 600 - 2 * borderThickness;
+    const borderThickness = GAME_CONFIG.borderThickness;
+    const innerGameWidth = GAME_CONFIG.canvasWidth - 2 * borderThickness;
 
-
-    const log = document.getElementById("log");
+    // const log = document.getElementById("log");
     let gameState = 'Unstarted';
-    let isPressingLeft, isPressingRight, paddle, ball, wallArray, brickArray, autoplay = false;
-    let gameLevel = 1;
+    let isPressingLeft, isPressingRight, paddle, ball, wallArray, brickArray, autoplay = false, rebound = false, gameLevel = 1;
 
     let topWall;
     let leftWall;
@@ -47,15 +45,18 @@ window.onload = () => {
 
     }
 
+    function clearOldElements() {
+        paddle.visible, ball.visible = false;
+        paddle.element.remove();
+        ball.element.remove();
+        brickArray.forEach(brick => brick.element.remove());
+    }
+
 
     function gameLoop(){
 
         if(brickArray.length === 0){
             gameState = 'Won';
-
-            paddle.visible, ball.visible = false;
-            paddle.element.remove();
-            ball.element.remove();
             gameLevel++;
 
             updateGameScreen();
@@ -64,17 +65,13 @@ window.onload = () => {
         else if(ball.y >= bottomWall.top){
             gameState = 'Lost';
 
-            paddle.visible, ball.visible = false;
-            paddle.element.remove();
-            ball.element.remove();
-
             updateGameScreen();
         }
         else if(['Playing', 'Unstarted' , 'Paused'].includes(gameState)) {
             updateGameScreen();
 
             if (['Playing'].includes(gameState)) {
-                if(autoplay) console.log('autoplay', paddle.speed, paddle.center, ball.x, paddle.center > ball.x ,paddle.center < ball.x );
+                // if(autoplay) console.log('autoplay', paddle.speed, paddle.center, ball.x, paddle.center > ball.x ,paddle.center < ball.x );
 
                 if (isPressingRight || (autoplay && paddle.center < ball.x )) {
                     console.log('Pressing Right');
@@ -86,7 +83,7 @@ window.onload = () => {
 
                 ball.move();
 
-                const paddleHit = ball.detect_paddle_collision(paddle);
+                const paddleHit = ball.detect_paddle_collision(paddle, rebound);
 
                 let wallHit = false;
                 for (let i = 0; i < wallArray.length;i++) {
@@ -98,15 +95,15 @@ window.onload = () => {
                 let remainingBricks = ball.detect_brick_collisions(brickArray);
 
                 if (paddleHit) {
-                    console.log('paddleHit', paddleHit);
+                    // console.log('paddleHit', paddleHit);
                 }
 
                 if (wallHit) {
-                    console.log('wallHit', wallHit);
+                    // console.log('wallHit', wallHit);
                 }
 
                 if (remainingBricks.length !== brickArray.length) {
-                    console.log('brickHit -', remainingBricks.length, ' bricks remaining.');
+                    // console.log('brickHit -', remainingBricks.length, ' bricks remaining.');
                     brickArray = remainingBricks;
                 }
                 // wait(delay);
@@ -127,6 +124,9 @@ window.onload = () => {
         if (e.key === 'a') {
             autoplay = !autoplay;
         }
+        if (e.key === 'r') {
+            rebound = !rebound;
+        }
         if (e.keyCode === 37) {
             isPressingLeft = true;
         }
@@ -134,8 +134,10 @@ window.onload = () => {
             isPressingRight = true;
         }
         if (e.code === 'Space') {
-            if (gameState === 'Won') {
+            if (gameState === 'Won' || gameState === 'Lost') {
                 gameState = 'Unstarted';
+                clearOldElements()
+
                 startNewGame();
             }
             else if (['Unstarted', 'Paused'].includes(gameState)) {
@@ -176,7 +178,7 @@ window.onload = () => {
         else if (gameState === 'Paused') {
             return 'Game is paused. Press space bar to resume.' }
         else if (gameState === 'Won') {
-            return  'You won! Congrats. Press space bar to the next level.' }
+            return  `You won! Congrats. Press space bar to play level ${gameLevel}` }
         else if (gameState === 'Lost') {
             return 'You lost! Try again.' }
         else if (gameState === 'Playing') {
@@ -192,13 +194,13 @@ window.onload = () => {
 
 
     function  createPaddle() {
-        const paddle = new Paddle('paddle', 325,550, 150, 25, 'paddle', 4 + gameLevel);
+        const paddle = new Paddle('paddle', 325,550, GAME_CONFIG.paddleWidth, GAME_CONFIG.paddleWidth/6, 'paddle', GAME_CONFIG.initialVelocity + gameLevel);
         gameDiv.appendChild(paddle.element);
         return paddle;
     }
 
     function  createBall() {
-        const ball = new Ball('ball', paddle.x + 0.5 * paddle.width, paddle.y - 2 * paddle.height , 6, 4 + gameLevel, -4-gameLevel, 'ball');
+        const ball = new Ball('ball', paddle.x + 0.5 * paddle.width, paddle.y - 2 * paddle.height , GAME_CONFIG.ballSize, GAME_CONFIG.initialVelocity + gameLevel, -GAME_CONFIG.initialVelocity-gameLevel, 'ball');
         gameDiv.appendChild(ball.element);
         return ball;
     }
